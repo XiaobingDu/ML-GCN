@@ -265,7 +265,7 @@ class Engine(object):
         end = time.time()
         for i, (input, target) in enumerate(data_loader):
             print('i......', i)
-            print('input shape....', input.shape)
+            print('input shape....', len(input))
             print('input......', input)
             print('target shape.....', target.shape)
             print('target.......', target)
