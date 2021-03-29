@@ -265,9 +265,9 @@ class Engine(object):
         end = time.time()
         for i, (input, target) in enumerate(data_loader):
             print('i......', i)
-            print('input shape....', len(input))
+            print('input shape....', len(input)) #len:3
             print('input......', input)
-            print('target shape.....', target.shape)
+            print('target shape.....', target.shape) #[32,20]
             print('target.......', target)
 
             # measure data loading time
@@ -413,13 +413,8 @@ class MultiLabelMAPEngine(Engine):
 class GCNMultiLabelMAPEngine(MultiLabelMAPEngine):
     def on_forward(self, training, model, criterion, data_loader, optimizer=None, display=True):
         feature_var = torch.autograd.Variable(self.state['feature']).float() #[32,3,448,448]
-        print('feature_var shape.....', feature_var.shape)
-        target_var = torch.autograd.Variable(self.state['target']).float() #[]
-        print('target_var shape.....', target_var.shape)
-        print('target_var.....', target_var)
-        inp_var = torch.autograd.Variable(self.state['input']).float().detach()  # one hot
-        print('input_var shape.....', inp_var.shape)
-        print('input_var.....', inp_var) # input ？？
+        target_var = torch.autograd.Variable(self.state['target']).float() #[32,20]
+        inp_var = torch.autograd.Variable(self.state['input']).float().detach()  # one hot [32,20,300]
 
         if not training:
             feature_var.volatile = True
@@ -428,7 +423,9 @@ class GCNMultiLabelMAPEngine(MultiLabelMAPEngine):
 
         # compute output
         self.state['output'] = model(feature_var, inp_var)
+        print('output......', self.state['output'])
         self.state['loss'] = criterion(self.state['output'], target_var)
+        print('loss......', self.state['loss'])
 
         if training:
             optimizer.zero_grad()
