@@ -1,4 +1,4 @@
-#-*-coding=uft-8-*-
+# -*-coding:utf-8-*-
 
 import torchvision.models as models
 from torch.nn import Parameter
