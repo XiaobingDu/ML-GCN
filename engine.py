@@ -407,8 +407,12 @@ class MultiLabelMAPEngine(Engine):
 class GCNMultiLabelMAPEngine(MultiLabelMAPEngine):
     def on_forward(self, training, model, criterion, data_loader, optimizer=None, display=True):
         feature_var = torch.autograd.Variable(self.state['feature']).float()
+        print('feature_var shape.....', feature_var.shape)
         target_var = torch.autograd.Variable(self.state['target']).float()
+        print('target_var.....', target_var)
         inp_var = torch.autograd.Variable(self.state['input']).float().detach()  # one hot
+        print('input_var.....', inp_var)
+
         if not training:
             feature_var.volatile = True
             target_var.volatile = True

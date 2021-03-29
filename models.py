@@ -1,3 +1,5 @@
+#-*-coding=uft-8-*-
+
 import torchvision.models as models
 from torch.nn import Parameter
 from util import *
@@ -33,7 +35,7 @@ class GraphConvolution(nn.Module):
             return output + self.bias
         else:
             return output
-
+    #显示属性
     def __repr__(self):
         return self.__class__.__name__ + ' (' \
                + str(self.in_features) + ' -> ' \
@@ -43,6 +45,8 @@ class GraphConvolution(nn.Module):
 class GCNResnet(nn.Module):
     def __init__(self, model, num_classes, in_channel=300, t=0, adj_file=None):
         super(GCNResnet, self).__init__()
+
+        #定义 Resnet-101
         self.features = nn.Sequential(
             model.conv1,
             model.bn1,
@@ -52,10 +56,11 @@ class GCNResnet(nn.Module):
             model.layer2,
             model.layer3,
             model.layer4,
-        )
+        ) #1
         self.num_classes = num_classes
-        self.pooling = nn.MaxPool2d(14, 14)
+        self.pooling = nn.MaxPool2d(14, 14) #2
 
+        #定义 GCN 2-layers
         self.gc1 = GraphConvolution(in_channel, 1024)
         self.gc2 = GraphConvolution(1024, 2048)
         self.relu = nn.LeakyReLU(0.2)
@@ -67,19 +72,28 @@ class GCNResnet(nn.Module):
         self.image_normalization_std = [0.229, 0.224, 0.225]
 
     def forward(self, feature, inp):
-        feature = self.features(feature)
-        feature = self.pooling(feature)
-        feature = feature.view(feature.size(0), -1)
+        #以下三行代码完成Resnet特征提取
+        #eq.3
+        feature = self.features(feature) #1
+        feature = self.pooling(feature) #2
+        feature = feature.view(feature.size(0), -1) #view：feature shape = 2D
 
-
+        #GCN：learning inter-dependent object classification
         inp = inp[0]
+        # tensor.detach(): 从self.A中分离出来的adj, 此时的adj与A共享存储空间
+        #adj与self.A的区别：adj没有梯度，self.A有梯度；在adj没有改变的情况下self.A可以反向求导，adj不可以
+        #adj是首先计算好的，在training过程中不会改变
         adj = gen_adj(self.A).detach()
         x = self.gc1(inp, adj)
         x = self.relu(x)
         x = self.gc2(x, adj)
+        print('output shape....', x.shape)
 
         x = x.transpose(0, 1)
-        x = torch.matmul(feature, x)
+        x = torch.matmul(feature, x) #eq.4
+        print('feature shape....', feature.shape)
+        print('x shape....', x.shape)
+
         return x
 
     def get_config_optim(self, lr, lrp):
