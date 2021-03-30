@@ -417,7 +417,7 @@ class GCNMultiLabelMAPEngine(MultiLabelMAPEngine):
         inp_var = torch.autograd.Variable(self.state['input']).float().detach()  # one hot [32,20,300]
 
         if not training:
-            feature_var.volatile = True
+            feature_var.volatile = True # no backward
             target_var.volatile = True
             inp_var.volatile = True
 
@@ -429,19 +429,26 @@ class GCNMultiLabelMAPEngine(MultiLabelMAPEngine):
 
         if training:
             optimizer.zero_grad()
-            self.state['loss'].backward()
-            nn.utils.clip_grad_norm(model.parameters(), max_norm=10.0)
+            self.state['loss'].backward() #loss backward
+            nn.utils.clip_grad_norm(model.parameters(), max_norm=10.0) #model training: dropout
             optimizer.step()
 
 
     def on_start_batch(self, training, model, criterion, data_loader, optimizer=None, display=True):
 
         self.state['target_gt'] = self.state['target'].clone()
+        print('target_gt.....', self.state['target_gt'])
         self.state['target'][self.state['target'] == 0] = 1
+        print('target.....', self.state['target'])
         self.state['target'][self.state['target'] == -1] = 0
+        print('target.....', self.state['target'])
 
         input = self.state['input']
+        print('on_start_batch input....', input)
         self.state['feature'] = input[0]
+        print('on_start_batch feature......', self.state['feature'])
         self.state['out'] = input[1]
+        print('on_start_batch out......', self.state['out'])
         self.state['input'] = input[2]
+        print('on_start_batch input......', self.state['input'])
 

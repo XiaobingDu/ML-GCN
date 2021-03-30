@@ -69,7 +69,7 @@ def main_coco():
     # state['device_ids'] = args.device_ids
     if args.evaluate:
         state['evaluate'] = True
-    engine = GCNMultiLabelMAPEngine(state)
+        engine = GCNMultiLabelMAPEngine(state)
     engine.learning(model, criterion, train_dataset, val_dataset, optimizer)
 
 if __name__ == '__main__':

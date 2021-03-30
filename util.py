@@ -136,7 +136,7 @@ def download_url(url, destination=None, progress_bar=True):
 
 class AveragePrecisionMeter(object):
     """
-    The APMeter measures the average precision per class.
+    The APMeter measures the average precision per class(CP).
     The APMeter is designed to operate on `NxK` Tensors `output` and
     `target`, and optionally a `Nx1` Tensor weight where (1) the `output`
     contains model output scores for `N` examples and `K` classes that ought to
@@ -173,12 +173,13 @@ class AveragePrecisionMeter(object):
                 each example (each weight > 0)
         """
         if not torch.is_tensor(output):
-            output = torch.from_numpy(output)
+            output = torch.from_numpy(output) # torch.from_numpy: transfer the 'numpy' to 'tensor'; same as torch.Tensor()
         if not torch.is_tensor(target):
             target = torch.from_numpy(target)
 
+        # the dim of output & target
         if output.dim() == 1:
-            output = output.view(-1, 1)
+            output = output.view(-1, 1) #add one dim
         else:
             assert output.dim() == 2, \
                 'wrong output size (should be 1D or 2D with one column \
@@ -189,7 +190,7 @@ class AveragePrecisionMeter(object):
             assert target.dim() == 2, \
                 'wrong target size (should be 1D or 2D with one column \
                 per class)'
-        if self.scores.numel() > 0:
+        if self.scores.numel() > 0: # numel: the number of tensor
             assert target.size(1) == self.targets.size(1), \
                 'dimensions for output should match previously added examples.'
 
@@ -207,7 +208,7 @@ class AveragePrecisionMeter(object):
         self.targets.narrow(0, offset, target.size(0)).copy_(target)
 
     def value(self):
-        """Returns the model's average precision for each class
+        """Returns the model's average precision for each class（CP）
         Return:
             ap (FloatTensor): 1xK tensor, with avg precision for each class k
         """
@@ -222,14 +223,14 @@ class AveragePrecisionMeter(object):
             scores = self.scores[:, k]
             targets = self.targets[:, k]
             # compute average precision
-            ap[k] = AveragePrecisionMeter.average_precision(scores, targets, self.difficult_examples)
+            ap[k] = AveragePrecisionMeter.average_precision(scores, targets, self.difficult_examples) # get cp
         return ap
 
     @staticmethod
-    def average_precision(output, target, difficult_examples=True):
+    def average_precision(output, target, difficult_examples=True): # for one class
 
         # sort examples
-        sorted, indices = torch.sort(output, dim=0, descending=True)
+        sorted, indices = torch.sort(output, dim=0, descending=True) #sorted by column; indices: the index for the elements rank
 
         # Computes prec@i
         pos_count = 0.
