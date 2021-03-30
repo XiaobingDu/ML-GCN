@@ -157,6 +157,8 @@ class AveragePrecisionMeter(object):
         """Resets the meter with empty member variables"""
         self.scores = torch.FloatTensor(torch.FloatStorage())
         self.targets = torch.LongTensor(torch.LongStorage())
+        print('scores shape....', self.scores.shape)
+        print('targets shape....', self.targets.shape)
 
     def add(self, output, target):
         """

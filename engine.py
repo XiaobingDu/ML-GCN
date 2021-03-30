@@ -437,18 +437,25 @@ class GCNMultiLabelMAPEngine(MultiLabelMAPEngine):
     def on_start_batch(self, training, model, criterion, data_loader, optimizer=None, display=True):
 
         self.state['target_gt'] = self.state['target'].clone()
+        print('target_gt shape.....', self.state['target_gt'].shape)
         print('target_gt.....', self.state['target_gt'])
         self.state['target'][self.state['target'] == 0] = 1
+        print('target shape.....', self.state['target'].shape)
         print('target.....', self.state['target'])
         self.state['target'][self.state['target'] == -1] = 0
+        print('target shape.....', self.state['target'].shape)
         print('target.....', self.state['target'])
 
         input = self.state['input']
+        print('on_start_batch input shape....', input.shape)
         print('on_start_batch input....', input)
         self.state['feature'] = input[0]
+        print('on_start_batch feature shape......', self.state['feature'].shape)
         print('on_start_batch feature......', self.state['feature'])
         self.state['out'] = input[1]
+        print('on_start_batch out shape......', self.state['out'].sahpe)
         print('on_start_batch out......', self.state['out'])
         self.state['input'] = input[2]
+        print('on_start_batch input shape......', self.state['input'].shape)
         print('on_start_batch input......', self.state['input'])
 
