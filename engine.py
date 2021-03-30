@@ -453,7 +453,7 @@ class GCNMultiLabelMAPEngine(MultiLabelMAPEngine):
         print('on_start_batch feature shape......', self.state['feature'].shape)
         print('on_start_batch feature......', self.state['feature'])
         self.state['out'] = input[1]
-        print('on_start_batch out shape......', self.state['out'].sahpe)
+        print('on_start_batch out shape......', self.state['out'].shape)
         print('on_start_batch out......', self.state['out'])
         self.state['input'] = input[2]
         print('on_start_batch input shape......', self.state['input'].shape)
